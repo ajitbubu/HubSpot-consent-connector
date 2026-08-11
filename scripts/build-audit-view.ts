@@ -83,16 +83,25 @@ function main(): void {
     .join("\n");
 
   const receiptRows = receipts
-    .map(
-      (r) => `<tr>
+    .map((r) => {
+      // An auditor must see WHY enforcement didn't happen, not just that it didn't.
+      const explanation =
+        r.status === "DELIVERED"
+          ? ""
+          : `<br><span class="soft">${esc(r.detail ?? "no detail recorded")}${
+              r.status === "NOT_SUPPORTED"
+                ? " — consent remains effective in the platform; enforcement routes via an alternate channel"
+                : ""
+            }</span>`;
+      return `<tr>
         <td class="mono">${esc(r.deliveryId.slice(0, 12))}…</td>
         <td class="mono">${esc(r.changeId ?? "")}</td>
-        <td>${r.status === "DELIVERED" ? '<span class="pill ok">DELIVERED</span>' : `<span class="pill unk">${esc(r.status)}</span>`}</td>
+        <td>${r.status === "DELIVERED" ? '<span class="pill ok">DELIVERED</span>' : `<span class="pill unk">${esc(r.status)}</span>`}${explanation}</td>
         <td class="mono">contact ${esc(r.destinationRecordId)}</td>
         <td class="mono">v${esc(r.consentVersion)}</td>
         <td class="mono">${esc(r.deliveredAt?.slice(0, 19).replace("T", " ") ?? "—")}</td>
-      </tr>`,
-    )
+      </tr>`;
+    })
     .join("");
 
   const html = `<title>Consent Records — Preference Center / Audit View</title>
