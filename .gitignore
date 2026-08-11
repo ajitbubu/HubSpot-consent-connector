@@ -4,3 +4,4 @@ node_modules/
 .consent-db.json
 audit-view.html
 .DS_Store
+.gstack/
